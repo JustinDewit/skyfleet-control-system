@@ -9,19 +9,22 @@ const Map = () => {
 
   useEffect(() => {
     if (mapContainerRef.current) {
-      // Initialize the map
-      const map = new maplibregl.Map({
-        container: mapContainerRef.current,
-        style: "https://demotiles.maplibre.org/style.json", // OSM style
-        center: [-74.006, 40.7128], // Initial map center (Longitude, Latitude)
-        zoom: 1, // Initial zoom level
-      });
+      let map: maplibregl.Map | undefined;
 
-      // Add navigation controls to the top-left corner of the map
-      map.addControl(new maplibregl.NavigationControl(), "top-left");
+      fetch("/api/map-style")
+        .then((response) => response.json())
+        .then((style) => {
+          map = new maplibregl.Map({
+            container: mapContainerRef.current!,
+            style: style,
+            center: [0, 0],
+            zoom: 2,
+          });
 
-      // Clean up on unmount
-      return () => map.remove();
+          map.addControl(new maplibregl.NavigationControl(), "top-left");
+        });
+
+      return () => map?.remove();
     }
   }, []);
 
